@@ -6,15 +6,19 @@ function menuOpciones() {
     return opcion
 }
 function nuevaReserva() {
-    let nombre = prompt("MILO RESTO\n\nIngrese el nombre de la persona");
-    let cantidadPersonas = prompt("MILO RESTO\n\nIngrese la cantidad de personas");
-    let fecha = prompt("MILO RESTO\n\nIngrese la fecha");
-    reservas.push({ nombre, cantidadPersonas, fecha })
-    alert("MILO RESTO\n\nSe ingresó una reserva a nombre de " + nombre + " para " + cantidadPersonas + " personas el dia " + fecha)
+    confirmacion = true
+    while (confirmacion) {
+        let nombre = prompt("MILO RESTO\n\nIngrese el nombre de la persona");
+        let cantidadPersonas = prompt("MILO RESTO\n\nIngrese la cantidad de personas");
+        let fecha = prompt("MILO RESTO\n\nIngrese la fecha");
+        reservas.push({ nombre, cantidadPersonas, fecha })
+        alert("MILO RESTO\n\nSe ingresó una reserva a nombre de " + nombre + " para " + cantidadPersonas + " personas el dia " + fecha)
+        confirmacion = confirm("Desea ingresar otra reserva?")
+    }
 }
 function mostrarReservas() {
     for (const reserva of reservas) {
-        alert("MILO RESTO\n\nFecha: " + reserva.fecha + " Nombre: " + reserva.nombre + " Cantidad de personas: " + reserva.cantidadPersonas + "\n")
+        alert("MILO RESTO\n\nFecha: " + reserva.fecha + "\nNombre: " + reserva.nombre + "\nCantidad de personas: " + reserva.cantidadPersonas + "\n")
     }
 }
 

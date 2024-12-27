@@ -33,14 +33,6 @@ function busquedaConNombre(nombre) {
     return busqueda;
 }
 
-function busquedaConFecha(fecha) {
-    const busqueda = reservas.map(el => el.fecha === fecha);
-    if (!busqueda) {
-        return -1;
-    }
-    return busqueda;
-}
-
 function validarFecha(fecha) {
     const { DateTime } = luxon;
     const fechaReservada = DateTime.fromISO(fecha);
@@ -61,15 +53,11 @@ function agregarReserva(e) {
     const cantidadPersonas = document.getElementById("personas").value;
     const cantidadInfante = document.getElementById("infantes").value;
 
-    const { DateTime } = luxon;
-
     if (nombre === "" || cantidadPersonas === "" || cantidadInfante === "" || fecha === "" || numeroContacto === "") {
         Toastify({
             text: "Todos los campos son obligatorios",
             duration: 3000,
-            style: {
-                background: "red",
-            },
+            backgroundColor: "red",
             close: true,
         }).showToast();
         return;
@@ -77,11 +65,9 @@ function agregarReserva(e) {
 
     if (!validarFecha(fecha)) {
         Toastify({
-            text: "Fecha inválida",
+            text: "La fecha no puede ser en el pasado",
             duration: 3000,
-            style: {
-                background: "red",
-            },
+            backgroundColor: "red",
             close: true,
         }).showToast();
         return;
@@ -103,9 +89,7 @@ function agregarReserva(e) {
         Toastify({
             text: "La cantidad de niños debe ser menor a la cantidad de personas",
             duration: 3000,
-            style: {
-                background: "red",
-            },
+            backgroundColor: "red",
             close: true,
         }).showToast();
         return;
@@ -117,50 +101,15 @@ function agregarReserva(e) {
     guardarEnLocalStorage();
 
     Toastify({
-        text: "Reserva cargada con éxito",
+        text: "Reserva agregada con éxito",
         duration: 3000,
-        style: {
-            background: "green",
-        },
+        backgroundColor: "green",
         close: true,
     }).showToast();
 
     formulario.classList.remove("muestra");
     formulario.classList.add("desaparece");
 }
-
-
-function consultarReserva(nombre) {
-    const reserva = busquedaConNombre(nombre);
-
-    if (reserva === -1) {
-        Swal.fire({
-            title: 'No se encontró reserva con ese nombre',
-            icon: 'error'
-        });
-        return;
-    } else {
-        imprimirReserva(reserva, formulario);
-        formulario.innerHTML +=
-            `
-            <h3>¿Qué desea hacer con esta reserva?</h3>
-            <button class ="btn" id="btn-modificar">Modificar</button>
-            <button class ="btn" id="btn-cancelar">Cancelar</button>
-        `;
-
-        const btnModificar = document.getElementById("btn-modificar");
-        const btnCancelar = document.getElementById("btn-cancelar");
-
-        btnModificar.addEventListener("click", () => { modificarReserva(reserva) });
-        btnCancelar.addEventListener("click", () => { cancelarReserva(reserva) });
-
-        formulario.classList.remove("desaparece");
-        formulario.classList.add("muestra");
-    }
-
-}
-
-
 
 function modificarNombre(reserva) {
     formulario.innerHTML =
@@ -180,9 +129,7 @@ function modificarNombre(reserva) {
         Toastify({
             text: "Nombre modificado con éxito",
             duration: 3000,
-            style: {
-                background: "green",
-            },
+            backgroundColor: "green",
             close: true,
         }).showToast();
 
@@ -209,9 +156,7 @@ function modificarFecha(reserva) {
             Toastify({
                 text: "La fecha no puede ser en el pasado",
                 duration: 3000,
-                style: {
-                    background: "red",
-                },
+                backgroundColor: "red",
                 close: true,
             }).showToast();
             return;
@@ -223,9 +168,7 @@ function modificarFecha(reserva) {
         Toastify({
             text: "Fecha modificada con éxito",
             duration: 3000,
-            style: {
-                background: "green",
-            },
+            backgroundColor: "green",
             close: true,
         }).showToast();
 
@@ -255,9 +198,7 @@ function modificarCantidad(reserva) {
             Toastify({
                 text: "Cantidad de personas modificada con éxito",
                 duration: 3000,
-                style: {
-                    background: "green",
-                },
+                backgroundColor: "green",
                 close: true,
             }).showToast();
         }
@@ -265,9 +206,7 @@ function modificarCantidad(reserva) {
             Toastify({
                 text: "La cantidad de personas debe ser mayor a 0",
                 duration: 3000,
-                style: {
-                    background: "red",
-                },
+                backgroundColor: "red",
                 close: true,
             }).showToast();
             return;
@@ -299,9 +238,7 @@ function modificarInfantes(reserva) {
             Toastify({
                 text: "Cantidad de niños modificada con éxito",
                 duration: 3000,
-                style: {
-                    background: "green",
-                },
+                backgroundColor: "green",
                 close: true,
             }).showToast();
         }
@@ -309,9 +246,7 @@ function modificarInfantes(reserva) {
             Toastify({
                 text: "La cantidad de niños debe ser menor a la cantidad de personas",
                 duration: 3000,
-                style: {
-                    background: "red",
-                },
+                backgroundColor: "red",
                 close: true,
             }).showToast();
             return;
@@ -340,9 +275,7 @@ function modificarContacto(reserva) {
         Toastify({
             text: "Número de contacto modificado con éxito",
             duration: 3000,
-            style: {
-                background: "green",
-            },
+            backgroundColor: "green",
             close: true,
         }).showToast();
 
@@ -351,37 +284,48 @@ function modificarContacto(reserva) {
     });
 }
 
-function modificarReserva(reserva) {
-    formulario.innerHTML = `<h2>Modificar reserva</h2>`
+function modificarReserva(e) {
+    e.preventDefault();
+    const nombre = document.getElementById("nombre").value;
+    let reserva = busquedaConNombre(nombre);
 
-    imprimirReserva(reserva, formulario);
+    if (reserva === -1) {
+        Toastify({
+            text: `No se encuentra una reserva a nombre de ${nombre}`,
+            duration: 3000,
+            backgroundColor: "red",
+            close: true,
+        }).showToast();
+    } else {
+        formulario.innerHTML = `<h2>Consultar / Modificar reserva</h2>`
+        imprimirReserva(reserva, formulario);
 
-    formulario.innerHTML +=
-        `
-            <h3>Seleccione que quiere modificar</h3>
-            <section class="opciones">
-                <button class ="btn" id="btn-modificar-nombre">Nombre</button>
-                <button class ="btn" id="btn-modificar-fecha">Fecha</button>
-                <button class ="btn" id="btn-modificar-cantidad">Cantidad de personas</button>
-                <button class ="btn" id="btn-modificar-infantes">Cantidad de niños</button>
-                <button class ="btn" id="btn-modificar-contacto">Contacto</button>
-            </section>
-        `;
+        formulario.innerHTML +=
+            `
+                <h3>Seleccione que quiere modificar</h3>
+                <section class="opciones">
+                    <button class ="btn" id="btn-modificar-nombre">Nombre</button>
+                    <button class ="btn" id="btn-modificar-fecha">Fecha</button>
+                    <button class ="btn" id="btn-modificar-cantidad">Cantidad de personas</button>
+                    <button class ="btn" id="btn-modificar-infantes">Cantidad de niños</button>
+                    <button class ="btn" id="btn-modificar-contacto">Contacto</button>
+                </section>
+            `;
 
-    const btnModificarNombre = document.getElementById("btn-modificar-nombre");
-    const btnModificarFecha = document.getElementById("btn-modificar-fecha");
-    const btnModificarCantidad = document.getElementById("btn-modificar-cantidad");
-    const btnModificarInfantes = document.getElementById("btn-modificar-infantes");
-    const btnModificarContacto = document.getElementById("btn-modificar-contacto");
+        const btnModificarNombre = document.getElementById("btn-modificar-nombre");
+        const btnModificarFecha = document.getElementById("btn-modificar-fecha");
+        const btnModificarCantidad = document.getElementById("btn-modificar-cantidad");
+        const btnModificarInfantes = document.getElementById("btn-modificar-infantes");
+        const btnModificarContacto = document.getElementById("btn-modificar-contacto");
 
-    btnModificarNombre.addEventListener("click", () => { modificarNombre(reserva) });
-    btnModificarFecha.addEventListener("click", () => { modificarFecha(reserva) });
-    btnModificarCantidad.addEventListener("click", () => { modificarCantidad(reserva) });
-    btnModificarInfantes.addEventListener("click", () => { modificarInfantes(reserva) });
-    btnModificarContacto.addEventListener("click", () => { modificarContacto(reserva) });
+        btnModificarNombre.addEventListener("click", () => { modificarNombre(reserva) });
+        btnModificarFecha.addEventListener("click", () => { modificarFecha(reserva) });
+        btnModificarCantidad.addEventListener("click", () => { modificarCantidad(reserva) });
+        btnModificarInfantes.addEventListener("click", () => { modificarInfantes(reserva) });
+        btnModificarContacto.addEventListener("click", () => { modificarContacto(reserva) });
 
+    }
 }
-
 
 function cancelarReserva(e) {
     e.preventDefault();
@@ -392,9 +336,7 @@ function cancelarReserva(e) {
         Toastify({
             text: `No se encuentra una reserva a nombre de ${nombre}`,
             duration: 3000,
-            style: {
-                background: "red",
-            },
+            backgroundColor: "red",
             close: true,
         }).showToast();
 
@@ -470,13 +412,14 @@ function mostrarReservas(reservas) {
         container.innerHTML = ``;
         reservas.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
         reservas.forEach(reserva => { imprimirReserva(reserva, container); });
-    }, 2000);
+    }, 2500);
 };
 
 const formulario = document.getElementById("formulario");
 const container = document.getElementById("container");
 const btnNuevaReserva = document.getElementById("btn-nueva-reserva");
-const btnConsultarReserva = document.getElementById("btn-consultar-reserva");
+const btnModificarReserva = document.getElementById("btn-modificar-reserva");
+const btnCancelarReserva = document.getElementById("btn-cancelar-reserva");
 const btnMostrarReservas = document.getElementById("btn-mostrar-reservas");
 
 
@@ -501,8 +444,7 @@ btnNuevaReserva.addEventListener("click", () => {
     formulario.addEventListener("submit", agregarReserva);
 });
 
-
-btnConsultarReserva.addEventListener("click", () => {
+btnModificarReserva.addEventListener("click", () => {
     if (reservas.length === 0) {
         Toastify({
             text: "No hay reservas",
@@ -513,70 +455,54 @@ btnConsultarReserva.addEventListener("click", () => {
             close: true,
         }).showToast();
     } else {
-        formulario.innerHTML = ``
-        formulario.classList.remove("desaparece");
-        formulario.classList.add("muestra");
-        container.classList.remove("muestra");
-        container.classList.add("desaparece");
-        async function buscarReserva() {
-            const { value: buscar } = await Swal.fire({
-                title: "Seleccione cómo quiere buscar...",
-                input: "select",
-                inputOptions: {
-                    nombre: "Nombre",
-                    fecha: "Fecha",
-                },
-                inputPlaceholder: "Seleccione una opción",
-                showCancelButton: true,
-                inputValidator: (value) => {
-                    if (!value) {
-                        return 'Debe seleccionar una opción';
-                    }
-                }
-            });
+        formulario.innerHTML =
+            `
+            <h2>Consultar / Modificar reserva</h2>
+            <input placeholder="Ingrese el nombre de la reserva a buscar" type="text" id="nombre">
+            <input type="submit" value="Buscar" id="buscar">
+        `;
 
-            if (buscar) {
-                if (buscar === "nombre") {
-                    const { value: nombre } = await Swal.fire({
-                        title: 'Ingrese el nombre de la reserva',
-                        input: 'text',
-                        inputPlaceholder: 'Nombre de la reserva',
-                        showCancelButton: true,
-                    });
+        const btnBuscar = document.getElementById("buscar");
 
-                    if (nombre) {
-                        consultarReserva(nombre);
-                    }
-                } else if (buscar === "fecha") {
-                    const { value: fecha } = await Swal.fire({
-                        title: 'Ingrese la fecha de la reserva',
-                        input: 'date',
-                        showCancelButton: true,
-                    });
-
-                    if (fecha) {
-                        const reserva = busquedaConFecha(fecha);
-                        if (reserva !== -1) {
-                            Swal.fire({
-                                title: 'Reserva Encontrada',
-                                html: `Nombre: ${reserva[0].nombre} <br>Fecha: ${reserva[0].fecha} <br>Cantidad de personas: ${reserva[0].cantidadPersonas}`,
-                                icon: 'success'
-                            });
-                        } else {
-                            Swal.fire({
-                                title: 'No se encontró ninguna reserva para esta fecha',
-                                icon: 'error'
-                            });
-                        }
-                    }
-                }
-            }
-        }
-
-        buscarReserva();
+        if (btnBuscar) {
+            formulario.classList.remove("desaparece");
+            formulario.classList.add("muestra");
+            container.classList.remove("muestra");
+            container.classList.add("desaparece");
+            btnBuscar.addEventListener("click", modificarReserva);
+        };
     };
 });
 
+btnCancelarReserva.addEventListener("click", () => {
+    if (reservas.length === 0) {
+        Toastify({
+            text: "No hay reservas",
+            duration: 3000,
+            style: {
+                background: "red",
+            },
+            close: true,
+        }).showToast();
+    } else {
+        formulario.innerHTML =
+            `
+        <h2>Cancelar reserva</h2>
+        <input placeholder="Ingrese el nombre de la reserva a cancelar" type="text" id="nombre">
+        <input type="submit" value="Buscar" id="buscar">
+        `;
+
+        const btnBuscar = document.getElementById("buscar");
+
+        if (btnBuscar) {
+            formulario.classList.remove("desaparece");
+            formulario.classList.add("muestra");
+            container.classList.remove("muestra");
+            container.classList.add("desaparece");
+            btnBuscar.addEventListener("click", cancelarReserva);
+        };
+    };
+});
 
 btnMostrarReservas.addEventListener("click", () => {
     if (reservas.length === 0) {

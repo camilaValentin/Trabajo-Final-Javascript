@@ -1,0 +1,74 @@
+[
+    {
+        "id": 1,
+        "nombre": "Juan",
+        "apellido": "Perez",
+        "telefono": "123456789",
+        "provee": "Pan",
+        "entrega": "Todos los días"
+    },
+    {
+        "id": 2,
+        "nombre": "Pedro",
+        "apellido": "Gomez",
+        "telefono": "987654321",
+        "provee": "Lácteos",
+        "entrega": "Viernes"
+    },
+    {
+        "id": 3,
+        "nombre": "Maria",
+        "apellido": "Gonzalez",
+        "telefono": "456789123",
+        "provee": "Huevos",
+        "entrega": "Martes"
+    },
+    {
+        "id": 4,
+        "nombre": "Jose",
+        "apellido": "Rodriguez",
+        "telefono": "789123456",
+        "provee": "Carne",
+        "entrega": "Lunes y miércoles"
+    },
+    {
+        "id": 5,
+        "nombre": "Carlos",
+        "apellido": "Lopez",
+        "telefono": "321654987",
+        "provee": "Frutas y verduras",
+        "entrega": "Todos los días"
+    },
+    {
+        "id": 6,
+        "nombre": "Ana",
+        "apellido": "Martinez",
+        "telefono": "654987321",
+        "provee": "Harinas",
+        "entrega": "Martes y jueves"
+    },
+    {
+        "id": 7,
+        "nombre": "Laura",
+        "apellido": "Sanchez",
+        "telefono": "987321654",
+        "provee": "Pescado",
+        "entrega": "Sábado"
+    },
+    {
+        "id": 8,
+        "nombre": "Lucia",
+        "apellido": "Alvarez",
+        "telefono": "987654321",
+        "provee": "Bebidas Alcoholicas",
+        "entrega": "Lunes y jueves"
+    },
+    {
+        "id": 9,
+        "nombre": "Fernando",
+        "apellido": "Diaz",
+        "telefono": "654321987",
+        "provee": "Bebidas No Alcoholicas",
+        "entrega": "Martes y sábado"
+    }
+]

@@ -10,13 +10,14 @@ let opcion;
 let confirmacion;
 let nombre;
 let indice;
+const { DateTime } = luxon;
 
 class Reserva {
     constructor(nombre, cantidadPersonas, cantidadInfante, fecha, numeroContacto) {
         this.nombre = nombre;
         this.cantidadPersonas = cantidadPersonas;
         this.cantidadInfante = cantidadInfante;
-        this.fecha = fecha;
+        this.fecha = DateTime.fromISO(fecha).toISODate();;
         this.numeroContacto = numeroContacto;
     }
 }
@@ -34,15 +35,15 @@ function busquedaConNombre(nombre) {
 }
 
 function busquedaConFecha(fecha) {
-    const busqueda = reservas.map(el => el.fecha === fecha);
-    if (!busqueda) {
+    const fechaISO = DateTime.fromISO(fecha).toISODate();
+    const busqueda = reservas.filter(el => el.fecha === fechaISO);
+    if (busqueda.length === 0) {
         return -1;
     }
     return busqueda;
 }
 
 function validarFecha(fecha) {
-    const { DateTime } = luxon;
     const fechaReservada = DateTime.fromISO(fecha);
     const hoy = DateTime.local().startOf('day');
 
@@ -61,7 +62,6 @@ function agregarReserva(e) {
     const cantidadPersonas = document.getElementById("personas").value;
     const cantidadInfante = document.getElementById("infantes").value;
 
-    const { DateTime } = luxon;
 
     if (nombre === "" || cantidadPersonas === "" || cantidadInfante === "" || fecha === "" || numeroContacto === "") {
         Toastify({
@@ -111,8 +111,7 @@ function agregarReserva(e) {
         return;
     }
 
-    const fechaReserva = DateTime.fromISO(fecha).toLocaleString(DateTime.DATE_MED);
-    let reserva = new Reserva(nombre, cantidadPersonas, cantidadInfante, fechaReserva, numeroContacto);
+    let reserva = new Reserva(nombre, cantidadPersonas, cantidadInfante, fecha, numeroContacto);
     reservas.push(reserva);
     guardarEnLocalStorage();
 
@@ -383,10 +382,7 @@ function modificarReserva(reserva) {
 }
 
 
-function cancelarReserva(e) {
-    e.preventDefault();
-    const nombre = document.getElementById("nombre").value;
-    let reserva = busquedaConNombre(nombre);
+function cancelarReserva(reserva) {
 
     if (reserva === -1) {
         Toastify({
@@ -468,16 +464,53 @@ function mostrarReservas(reservas) {
 
     setTimeout(() => {
         container.innerHTML = ``;
-        reservas.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
-        reservas.forEach(reserva => { imprimirReserva(reserva, container); });
+        if (Array.isArray(reservas)) {
+            container.innerHTML = ``;
+            reservas.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+            reservas.forEach(reserva => { imprimirReserva(reserva, container); });
+        } else {
+            imprimirReserva(reservas, container);
+        }
     }, 2000);
 };
+
+
+function imprimirProveedor(proveedor) {
+    container.innerHTML +=
+        `
+            <div class="tarjeta">
+                <p>Nombre completo: ${proveedor.nombre} ${proveedor.apellido}</p>
+                <p>Teléfono: ${proveedor.telefono}</p>
+                <p>Provee: ${proveedor.provee}</p>
+                <p>Días de entrega: ${proveedor.entrega}</p>
+            </div>
+        `;
+}
+
+
+function mostrarProveedores() {
+    container.innerHTML = `<p>Cargando proveedores...</p>`;
+
+    setTimeout(() => {
+        container.innerHTML = ``;
+        fetch("JSON/proveedores.json")
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                const proveedores = data;
+                console.log(proveedores);
+                proveedores.forEach((el) => { imprimirProveedor(el); })
+            })
+            .catch(err => console.error(err))
+    }, 2000);
+}
 
 const formulario = document.getElementById("formulario");
 const container = document.getElementById("container");
 const btnNuevaReserva = document.getElementById("btn-nueva-reserva");
 const btnConsultarReserva = document.getElementById("btn-consultar-reserva");
 const btnMostrarReservas = document.getElementById("btn-mostrar-reservas");
+const btnProveedores = document.getElementById("btn-proveedores");
 
 
 btnNuevaReserva.addEventListener("click", () => {
@@ -555,13 +588,16 @@ btnConsultarReserva.addEventListener("click", () => {
                     });
 
                     if (fecha) {
-                        const reserva = busquedaConFecha(fecha);
-                        if (reserva !== -1) {
-                            Swal.fire({
-                                title: 'Reserva Encontrada',
-                                html: `Nombre: ${reserva[0].nombre} <br>Fecha: ${reserva[0].fecha} <br>Cantidad de personas: ${reserva[0].cantidadPersonas}`,
-                                icon: 'success'
-                            });
+                        const fechaISO = DateTime.fromISO(fecha).toISODate();
+                        const reservasPorFecha = busquedaConFecha(fechaISO);
+                        if (reservasPorFecha !== -1) {
+                            console.log(reservasPorFecha);
+                            container.innerHTML = ``;
+                            formulario.classList.remove("muestra");
+                            formulario.classList.add("desaparece");
+                            container.classList.remove("desaparece");
+                            container.classList.add("muestra");
+                            mostrarReservas(reservasPorFecha);
                         } else {
                             Swal.fire({
                                 title: 'No se encontró ninguna reserva para esta fecha',
@@ -596,4 +632,14 @@ btnMostrarReservas.addEventListener("click", () => {
         container.classList.add("muestra");
         mostrarReservas(reservas);
     };
+});
+
+btnProveedores.addEventListener("click", () => {
+    formulario.innerHTML = ``
+    container.innerHTML = ``
+    formulario.classList.remove("muestra");
+    formulario.classList.add("desaparece");
+    container.classList.remove("desaparece");
+    container.classList.add("muestra");
+    mostrarProveedores();
 });

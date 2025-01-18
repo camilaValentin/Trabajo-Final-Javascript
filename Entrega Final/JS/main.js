@@ -1,4 +1,4 @@
-/* SISTEMA DE MANEJO DE RESERVAS INTERNO DE UN RESTAURANTE */
+/* SISTEMA DE GESTION DE UN RESTAURANTE */
 
 let reservas;
 if (localStorage.getItem("reservas")) {
@@ -496,12 +496,20 @@ function mostrarProveedores() {
         fetch("JSON/proveedores.json")
             .then(response => response.json())
             .then(data => {
-                console.log(data);
                 const proveedores = data;
-                console.log(proveedores);
                 proveedores.forEach((el) => { imprimirProveedor(el); })
             })
-            .catch(err => console.error(err))
+            .catch(err => {
+                console.error(err)
+                Toastify({
+                    text: "Se produjo un error al obtener los proveedores",
+                    duration: 3000,
+                    style: {
+                        background: "red",
+                    },
+                    close: true,
+                }).showToast();
+            })
     }, 2000);
 }
 
@@ -591,7 +599,6 @@ btnConsultarReserva.addEventListener("click", () => {
                         const fechaISO = DateTime.fromISO(fecha).toISODate();
                         const reservasPorFecha = busquedaConFecha(fechaISO);
                         if (reservasPorFecha !== -1) {
-                            console.log(reservasPorFecha);
                             container.innerHTML = ``;
                             formulario.classList.remove("muestra");
                             formulario.classList.add("desaparece");
